@@ -111,25 +111,49 @@ legend_html =   '''
 
 map1.get_root().html.add_child(folium.Element(legend_html))
 map1.save('map1.html')
-webbrowser.open('map1.html')
+#webbrowser.open('map1.html')
 
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(64, activation='relu', input_shape=(1,)),
-])
+df = pd.read_csv("training.csv", delimiter=",", skip_blank_lines=True, skipinitialspace=True, engine='python',
+                 header=0)
+df = df[df['Crime ID'] != '']
+df = df.set_index("Crime ID")
+df = df[df['Longitude'] > -4.044780]
+df = df[df['Longitude'] < -3.772868]
+df = df[df['Latitude'] > 51.579037]
+df = df[df['Latitude'] < 51.702400]
+df = df[df['Latitude'].notnull()]
+df = df[df['Longitude'].notnull()]
+df = df[df['Crime type'].notnull()]
 
-model.compile(optimizer='adam',
-                loss='mse',
-                metrics=['mae', 'mse'])
+# make a model that uses the read in data
+tensorflow = tf.keras.models.Sequential()
+tensorflow.add(tf.keras.layers.Dense(64, activation=tf.nn.relu))
+tensorflow.add(tf.keras.layers.Dense(2))
+tensorflow.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
+# train the model
+tensorflow.fit(df[['Longitude', 'Latitude']], df[['Longitude', 'Latitude']], epochs=5)
+# save the model
+tensorflow.save('model.h5')
 
-model.fit(df['Longitude'], df['Latitude'], epochs=10)
+tensorflow = tf.keras.models.load_model('model.h5')
+df = pd.read_csv("training.csv", delimiter=",", skip_blank_lines=True, skipinitialspace=True, engine='python', header=0)
+df = df[df['Crime ID'] != '']
+df = df.set_index("Crime ID")
+df = df[df['Longitude'] > -4.044780]
+df = df[df['Longitude'] < -3.772868]
+df = df[df['Latitude'] > 51.579037]
+df = df[df['Latitude'] < 51.702400]
+df = df[df['Latitude'].notnull()]
+df = df[df['Longitude'].notnull()]
+df = df[df['Crime type'].notnull()]
+df = df[['Longitude', 'Latitude']]
 
-model.evaluate(df['Longitude'], df['Latitude'])
-
-# plot the predicted values from the model
-plt.scatter(df['Longitude'], df['Latitude'], c='blue')
-plt.plot(df['Longitude'], model.predict(df['Longitude']), c='red')
-plt.plot(df['Latitude'], model.predict(df['Latitude']), c='red')
+predictions = tensorflow.predict(df)
+plt.scatter(predictions[:, 0], predictions[:, 1], c='r')
 plt.show()
+
+
+
 
 
 
