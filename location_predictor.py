@@ -1,6 +1,7 @@
 import folium
 import numpy as np
 import pandas as pd
+from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
@@ -50,10 +51,14 @@ model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=2)
 
 input_data = pd.read_csv('southwales12.csv')
 input_data = clean_data(input_data)
+print(f'Number of rows: {len(data)}')
 input_data_scaled = scaler.transform(input_data)
 
-predicted_crime_locations = model.predict(input_data_scaled[:8000])
+predicted_crime_locations = model.predict(input_data_scaled[:10017])
 predicted_crime_locations = scaler.inverse_transform(predicted_crime_locations)
+
+mae = mean_absolute_error(input_data[:10017], predicted_crime_locations)
+print(f'Mean Absolute Error (MAE): {mae}')
 
 south_latitude = 51.59
 north_latitude = 51.67
