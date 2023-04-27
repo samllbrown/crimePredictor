@@ -47,7 +47,6 @@ crime_type_colour_map = {
     'Possession of weapons': 'beige'
 }
 
-
 def generate_crime_map(center_latitude, center_longitude, crime_locations, crime_types, crime_type_colour_map):
     crime_map = folium.Map(location=[center_latitude, center_longitude], zoom_start=12)
 
@@ -126,6 +125,6 @@ center_latitude = np.mean([coord[0] for coord in filtered_crime_locations])
 center_longitude = np.mean([coord[1] for coord in filtered_crime_locations])
 
 crime_map = generate_crime_map(center_latitude, center_longitude, filtered_crime_locations, filtered_crime_types, crime_type_colour_map)
-crime_map.save("compiled.html")
-webbrowser.open("compiled.html")
+crime_map.save("swansea_predicted_crime_map.html")
+webbrowser.open("swansea_predicted_crime_map.html")
 
